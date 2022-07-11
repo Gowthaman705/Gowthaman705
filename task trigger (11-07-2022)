@@ -1,0 +1,31 @@
+/*============================================================================================================
+*Trigger Name     : TaskTrigger 
+*Description    : All the implementations related to Task insert update delete and undelete.
+*Company        : Merfantz Technology Pvt Ltd.
+*Date           : 29th Oct, 2020
+*Version        : 1.0
+*Change History : Initial Trigger Handler
+*============================================================================================================*/
+trigger TaskTrigger on Task (after insert,after update,after delete,after undelete) {
+   TaskTriggerHandler handler=new TaskTriggerHandler();
+   if(Trigger.isAfter && Trigger.isInsert){
+      handler.onAfterInsert(Trigger.newMap);
+      handler.countafterInsert(Trigger.newMap);
+   }
+   
+   if(Trigger.isAfter && Trigger.isUpdate){
+      handler.onAfterUpdate(Trigger.newMap,Trigger.oldMap);
+      handler.countafterUpdate(Trigger.newMap,Trigger.oldMap);
+      
+   }
+   
+   if(Trigger.isAfter && Trigger.isDelete){
+      handler.onAfterDelete(Trigger.oldMap);
+      handler.countafterdelete(Trigger.oldMap);
+   } 
+   
+   if(Trigger.isAfter && Trigger.isUndelete){
+      handler.onAfterUndelete(Trigger.newMap);
+   
+   } 
+}
