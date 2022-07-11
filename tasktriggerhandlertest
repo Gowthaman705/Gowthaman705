@@ -1,0 +1,66 @@
+@isTest(seeAllData=true)
+/*============================================================================================================
+*Class Name     : TaskTriggerHandlerTest
+*Description    : All the implementations related to test TaskTriggerHandler
+*Company        : Merfantz Technology Pvt Ltd
+*Date           : 29th Oct, 2020
+*Version        : 1.0
+*Change History : Initial Trigger Handler
+*Methods        : public testMethod static void method1()
+*============================================================================================================*/
+public class TaskTriggerHandlerTest{
+/*====================================================
+*Method Name     : method1
+*Description     : This method test TaskTrigger.
+*Arguments       : No Argument
+*Ticket No       : 50973
+====================================================*/
+   public testMethod static void method1(){
+      
+      InternalConfig__c ic=new InternalConfig__c();
+      ic.Enable__c=false;
+      ic.name='Test';
+      insert ic;
+     
+      //Account insert
+      Account acnt=new Account();
+      acnt.name='Test Account';
+      acnt.Status__c='Active';
+      acnt.Type='Roofer';
+      acnt.Account_Contact_Frequency__c='3 Months';
+      insert acnt;
+      
+      //Insert Property
+      Property__c prop=new Property__c();
+      prop.name='Test Property';
+      prop.Account__c=acnt.id;
+      insert prop;
+      
+      //Insert Activity
+      Activity__c act=new Activity__c();
+      act.name='Test';
+      act.Account__c=acnt.id;
+      act.Property__c=prop.id;
+      insert act;
+      
+      //Task 
+      Task t=new Task();
+      t.subject='Test Subject';
+      t.Status='Completed';
+      t.ActivityDate=system.today();
+      t.Sales_Contact_Method__c='Email - In';
+      t.whatid=act.id;
+      insert t;
+      
+      t.Sales_Contact_Method__c='Phone Call - Result';      
+      update t;
+      
+      delete t;
+      
+      undelete t;
+      
+      
+      
+   }
+
+}
