@@ -1,0 +1,120 @@
+public class Taskobjcount {
+    
+public static void updateofTask(List<Task> newtskList, List<Task> oldtskList) 
+ {
+     Set<ID> parentIDSet = new Set<ID>();
+        Map<ID, ID> oldtskListMap = new Map<ID, ID>();
+        
+        for(Task tsRec: newtskList){
+            parentIDSet.add(tsRec.WhoId);
+        }
+        
+        for(Task tRec: oldtskList){
+            parentIDSet.add(tRec.WhoId);
+            oldtskListMap.put(tRec.Id, tRec.WhoId);
+        }
+        
+        Map<ID, Contact> parentMap = new map<ID, Contact>([select id, Overall_Sales_Effort__c from Contact where id in :parentIDSet]);
+        for(Task  TsRec: newtskList)
+       {
+        /*if(ChildRec.Parent__c!=null){  */
+            if(parentMap.get(TsRec.WhoId).Overall_Sales_Effort__c == null){
+                parentMap.get(TsRec.WhoId).Overall_Sales_Effort__c = 0;
+            }
+           // }
+            if(TsRec.WhoId != oldtskListMap.get(TsRec.id)){
+                if(oldtskListMap.get(TsRec.id) == null && TsRec.WhoId != null){
+                    parentMap.get(TsRec.WhoId).Overall_Sales_Effort__c ++;
+                }else if(oldtskListMap.get(TsRec.id) != null && TsRec.WhoId == null){
+                    parentMap.get(oldtskListMap.get(TsRec.id)).Overall_Sales_Effort__c --;
+                }else if(oldtskListMap.get(TsRec.id) != null && TsRec.WhoId != null){
+                    parentMap.get(oldtskListMap.get(TsRec.id)).Overall_Sales_Effort__c --;
+                    parentMap.get(TsRec.WhoId).Overall_Sales_Effort__c ++;
+                }
+            }
+            
+        }
+        update parentMap.values();
+ }
+    
+    
+    
+    
+    public static void deleteofTask(List<Task> Tsklist) 
+ {
+     Set<ID> parentIDSet = new Set<ID>();
+        for(Task tRec: Tsklist){
+            parentIDSet.add(tRec.WhoId);
+        }
+        
+        Map<ID, Contact> parentMap = new map<ID, Contact>([select id, Overall_Sales_Effort__c from Contact where id in :parentIDSet]);
+        for(Task taskRec: Tsklist){
+            if(parentMap.get(taskRec.WhoId).Overall_Sales_Effort__c == null){
+                parentMap.get(taskRec.WhoId).Overall_Sales_Effort__c = 0;
+            }
+            parentMap.get(taskRec.WhoId).Overall_Sales_Effort__c --;
+        }
+        update parentMap.values();
+ }
+    
+    
+ public static void beforeinsertofTask(List<Task> Tsklist) 
+ {
+     Set<ID> parentIDSet = new Set<ID>();
+        
+        for(Task TaskRec: Tsklist){
+     
+            parentIDSet.add(TaskRec.WhoId);
+            
+        }
+        
+        Map<ID, Contact> parentMap = new map<ID, Contact>([select id, Overall_Sales_Effort__c from Contact where id in :parentIDSet]);
+        for(Task tdRec: Tsklist){
+            if(parentMap.get(tdRec.WhoId).Overall_Sales_Effort__c == null){
+                parentMap.get(tdRec.WhoId).Overall_Sales_Effort__c = 0;
+            }
+            parentMap.get(tdRec.WhoId).Overall_Sales_Effort__c ++;
+        }
+        update parentMap.values();
+
+ }
+    
+    
+    
+    public static void beforeupdateofTask(map<id,Task> oldmap,map<id,Task> Newmap) 
+   {
+   
+    }
+
+ 
+    
+    
+    
+    
+ public static void calculateNumberofTask(List<Task> Tsklist) 
+ {
+   Set<Id>Contact = new Set<Id>();
+     Map<Id,Contact> ContactMap = new Map<Id,Contact>();
+     for(Task tsk:tsklist)
+     {
+       if(tsk.WhoId!=null)
+       {
+           Contact.add(tsk.WhoId);
+       }
+     }
+     if(Contact!=null && Contact.size()>0)
+     {
+        for(AggregateResult agrResultobj:[Select count(Id),WhoId from Task where WhoId In:Contact Group By WhoId])
+        {
+            Contact con = new Contact();
+            con.Id = (Id)agrResultobj.get('WhoId');
+            con.Overall_Sales_Effort__c = (Integer)agrResultobj.get('contCount');
+            ContactMap.put(con.Id,con);
+        }
+         if(ContactMap!=null && ContactMap.size()>0) 
+         {
+             update ContactMap.values();
+         }
+     }
+ }
+}
